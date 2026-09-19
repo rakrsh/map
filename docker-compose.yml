@@ -1,0 +1,80 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: map-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mapdb
+      POSTGRES_USER: mapuser
+      POSTGRES_PASSWORD: map_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+
+  redis:
+    image: redis:7-alpine
+    container_name: map-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    container_name: map-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+      - ./config/elasticsearch/mappings.json:/usr/share/elasticsearch/config/mappings.json:ro
+
+  routing-service:
+    build:
+      context: ./services/routing-service
+    container_name: map-routing
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      PORT: 8081
+      POSTGRES_DSN: postgres://mapuser:map_password@postgres:5432/mapdb?sslmode=disable
+      REDIS_ADDR: redis:6379
+    depends_on:
+      - postgres
+      - redis
+
+  geocoding-service:
+    build:
+      context: ./services/geocoding-service
+    container_name: map-geocoding
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
+  tile-service:
+    build:
+      context: ./services/tile-service
+    container_name: map-tiles
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      PORT: 8082
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  elasticsearch_data:
