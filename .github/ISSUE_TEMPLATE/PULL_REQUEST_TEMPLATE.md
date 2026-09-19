@@ -1,3 +1,27 @@
+## PR Title
+Use a concise, descriptive title in the format: `type: summary of change`
+
+Common types:
+- `feat` – new feature or functionality
+- `fix` – bug fix
+- `docs` – documentation updates
+- `chore` – maintenance, tooling, or housekeeping tasks
+- `refactor` – internal restructuring without behavior changes
+- `test` – test additions or fixes
+- `perf` – performance improvements
+- `ci` – CI or workflow updates
+- `revert` – revert a previous change
+
+Examples:
+- `docs: add pull request template`
+- `feat: add user dashboard filters`
+- `fix: resolve login validation error`
+- `refactor: simplify API response handling`
+- `chore: update repository automation`
+- `test: add coverage for validation logic`
+- `perf: optimize map rendering performance`
+- `ci: update GitHub Actions workflow`
+
 ## Description
 Provide a concise summary of the changes made in this PR and the context behind them.
 
