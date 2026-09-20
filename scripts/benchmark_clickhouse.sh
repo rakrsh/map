@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Ravi Sharma
+
 set -euo pipefail
 
 CLICKHOUSE_URL="${CLICKHOUSE_URL:-http://localhost:8123}"

@@ -1,3 +1,5 @@
+"""Copyright (c) 2026 Ravi Sharma."""
+
 class GeocoderService:
     def __init__(self):
         pass

@@ -1,0 +1,44 @@
+name: AI governance validation
+
+on:
+  pull_request:
+    paths:
+      - AGENTS.md
+      - CONTRIBUTING.md
+      - .github/copilot-instructions.md
+      - .github/skills/**
+      - .github/workflows/ai-governance.yml
+  push:
+    branches: [main]
+    paths:
+      - AGENTS.md
+      - CONTRIBUTING.md
+      - .github/copilot-instructions.md
+      - .github/skills/**
+      - .github/workflows/ai-governance.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate required files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s AGENTS.md
+          test -s CONTRIBUTING.md
+          test -s .github/copilot-instructions.md
+          test -s .github/skills/add-copyright-headers/SKILL.md
+          test -s .github/skills/generate-unit-tests/SKILL.md
+      - name: Validate skill frontmatter
+        shell: bash
+        run: |
+          set -euo pipefail
+          for skill in .github/skills/*/SKILL.md; do
+            grep -q '^name:' "$skill"
+            grep -q '^description:' "$skill"
+          done

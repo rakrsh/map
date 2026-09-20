@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Ravi Sharma
+
 """Summarize pgbench latency logs in milliseconds."""
 
 from __future__ import annotations
