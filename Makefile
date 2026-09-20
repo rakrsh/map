@@ -1,6 +1,6 @@
 # Makefile for local development and service orchestration
 
-.PHONY: dev-up dev-down logs build test fmt lint benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3
+.PHONY: dev-up dev-down logs build test fmt lint benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3 benchmark-graph
 
 dev-up:
 	docker compose up --build -d
@@ -46,3 +46,6 @@ benchmark-scylladb:
 
 benchmark-h3:
 	@python3 scripts/benchmark_h3.py
+
+benchmark-graph:
+	@cd services/routing-service && go run ./cmd/graph-benchmark

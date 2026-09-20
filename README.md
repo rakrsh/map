@@ -180,6 +180,14 @@ make benchmark-h3
 
 The PostGIS benchmark generates OSM-shaped roads, POIs, and polygons, then reports bulk throughput, spatial query plans, concurrent p50/p95/p99 latency, and container memory snapshots. Reports are written to `benchmarks/results/` and are ignored by Git. See `docs/adr/0001-geospatial-database-engine-benchmark.md` for the protocol and current baseline.
 
+Issue #4 includes a CH/CCH navigation graph update benchmark:
+
+```bash
+make benchmark-graph
+```
+
+The current prototype selects CCH for dynamic traffic updates. See `docs/adr/0002-navigation-graph-architecture.md` for the measured comparison and production follow-up work.
+
 ## Current Status
 
 This repository is in its bootstrap stage. The structure is set up to support the planned navigation application, but the core business logic, spatial indexes, and API contracts are still being implemented.
