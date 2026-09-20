@@ -20,3 +20,8 @@ Explain why this feature would be valuable to users or the codebase.
 
 ## Additional Context
 Add any extra context, design mockups, or screenshots about the feature request here.
+
+## Related Issues
+- **Related:** #
+- **Depends on:** #
+- **Follow-up to:** #
