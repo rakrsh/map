@@ -1,3 +1,5 @@
+// Copyright (c) 2026 Ravi Sharma
+
 package graph
 
 // Graph represents a lightweight routing graph model used for pathfinding.

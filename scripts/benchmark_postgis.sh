@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Ravi Sharma
+
 set -euo pipefail
 
 CONTAINER_NAME="${POSTGIS_CONTAINER:-map-postgres}"

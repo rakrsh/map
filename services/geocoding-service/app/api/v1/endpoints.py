@@ -1,3 +1,5 @@
+"""Copyright (c) 2026 Ravi Sharma."""
+
 from fastapi import APIRouter
 
 router = APIRouter()

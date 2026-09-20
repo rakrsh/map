@@ -1,3 +1,5 @@
+"""Copyright (c) 2026 Ravi Sharma."""
+
 import os
 from pydantic import BaseModel
 

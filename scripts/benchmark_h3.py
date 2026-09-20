@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Ravi Sharma
+
 """H3 indexing adapter for the shared point workload."""
 
 from __future__ import annotations
