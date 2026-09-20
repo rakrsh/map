@@ -16,6 +16,8 @@ AI agents must follow:
 
 In VS Code, repository instructions are loaded automatically by supported Copilot features. Ask the agent to use a skill by naming its directory and provide the relevant issue or file scope. Review generated changes as if they were human-authored.
 
+To activate Agent Mode in VS Code, open Copilot Chat, choose **Agent** from the mode selector, and provide the issue number, requested scope, and expected verification. In other supported IDE or CLI integrations, select the equivalent agent workflow and apply the same repository instructions.
+
 ## Verification
 
 Before opening a PR, run:

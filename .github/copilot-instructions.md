@@ -18,7 +18,7 @@ Map Navigation Engine is a service-oriented map platform with Go routing and til
 
 - Follow trunk-based development with short-lived branches and small PRs.
 - Preserve existing public APIs unless the issue requires a contract change.
-- Add or update focused tests for production behavior changes.
+- Write or update focused unit tests for production behavior changes, plus integration, end-to-end, or performance tests when the change requires them.
 - For every feature update, review and update all affected skills, agent instructions, documentation, tests, README, CONTRIBUTING.md, configuration, API contracts, and other necessary files in the same change.
 - Prefer existing project patterns and standard libraries over new abstractions.
 - Do not add secrets, credentials, tokens, local paths, or machine-specific URLs.
