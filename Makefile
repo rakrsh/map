@@ -1,6 +1,6 @@
 # Makefile for local development and service orchestration
 
-.PHONY: dev-up dev-down logs build test fmt lint benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3 benchmark-graph
+.PHONY: dev-up dev-down logs build test fmt lint validate-config benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3 benchmark-graph
 
 dev-up:
 	docker compose up --build -d
@@ -31,9 +31,14 @@ fmt:
 
 lint:
 	@echo "Running static checks..."
+	@$(MAKE) validate-config
 	@cd services/routing-service && go vet ./...
 	@cd services/tile-service && go vet ./...
 	@cd services/geocoding-service && python -m compileall app
+	@test -z "$$(gofmt -l services/routing-service services/tile-service)"
+
+validate-config:
+	@docker compose --env-file .env.example config --quiet
 
 benchmark-postgis:
 	@bash scripts/benchmark_postgis.sh

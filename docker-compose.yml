@@ -6,14 +6,19 @@ services:
     container_name: map-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: mapdb
-      POSTGRES_USER: mapuser
-      POSTGRES_PASSWORD: map_password
+      POSTGRES_DB: ${POSTGRES_DB:?Copy .env.example to .env first}
+      POSTGRES_USER: ${POSTGRES_USER:?Copy .env.example to .env first}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copy .env.example to .env first}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -21,6 +26,11 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
@@ -35,6 +45,11 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
       - ./config/elasticsearch/mappings.json:/usr/share/elasticsearch/config/mappings.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   routing-service:
     build:
@@ -44,12 +59,14 @@ services:
     ports:
       - "8081:8081"
     environment:
-      PORT: 8081
-      POSTGRES_DSN: postgres://mapuser:map_password@postgres:5432/mapdb?sslmode=disable
-      REDIS_ADDR: redis:6379
+      PORT: ${ROUTING_SERVICE_PORT:-8081}
+      POSTGRES_DSN: ${POSTGRES_DSN:?Copy .env.example to .env first}
+      REDIS_ADDR: ${REDIS_INTERNAL_ADDR:?Copy .env.example to .env first}
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   geocoding-service:
     build:
@@ -59,9 +76,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_URL: ${ELASTICSEARCH_INTERNAL_URL:?Copy .env.example to .env first}
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
 
   tile-service:
     build:
@@ -71,9 +89,10 @@ services:
     ports:
       - "8082:8082"
     environment:
-      PORT: 8082
+      PORT: ${TILE_SERVICE_PORT:-8082}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
