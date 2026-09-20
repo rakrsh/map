@@ -1,6 +1,6 @@
 # Makefile for local development and service orchestration
 
-.PHONY: dev-up dev-down logs build test fmt lint
+.PHONY: dev-up dev-down logs build test fmt lint benchmark-postgis
 
 dev-up:
 	docker compose up --build -d
@@ -34,3 +34,6 @@ lint:
 	@cd services/routing-service && go vet ./...
 	@cd services/tile-service && go vet ./...
 	@cd services/geocoding-service && python -m compileall app
+
+benchmark-postgis:
+	@bash scripts/benchmark_postgis.sh
