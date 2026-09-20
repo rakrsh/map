@@ -1,6 +1,6 @@
 # Makefile for local development and service orchestration
 
-.PHONY: dev-up dev-down logs build test fmt lint
+.PHONY: dev-up dev-down logs build test fmt lint benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3
 
 dev-up:
 	docker compose up --build -d
@@ -34,3 +34,15 @@ lint:
 	@cd services/routing-service && go vet ./...
 	@cd services/tile-service && go vet ./...
 	@cd services/geocoding-service && python -m compileall app
+
+benchmark-postgis:
+	@bash scripts/benchmark_postgis.sh
+
+benchmark-clickhouse:
+	@bash scripts/benchmark_clickhouse.sh
+
+benchmark-scylladb:
+	@bash scripts/benchmark_scylladb.sh
+
+benchmark-h3:
+	@python3 scripts/benchmark_h3.py

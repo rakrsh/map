@@ -161,6 +161,25 @@ cd services/geocoding-service
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
+## Geospatial Benchmarking
+
+Issue #3 includes a reproducible PostGIS baseline and optional comparison adapters:
+
+```bash
+# Start PostGIS
+docker compose up -d postgres
+
+# Run the PostGIS workload and write a local report
+make benchmark-postgis
+
+# Optional comparison adapters
+make benchmark-clickhouse
+make benchmark-scylladb
+make benchmark-h3
+```
+
+The PostGIS benchmark generates OSM-shaped roads, POIs, and polygons, then reports bulk throughput, spatial query plans, concurrent p50/p95/p99 latency, and container memory snapshots. Reports are written to `benchmarks/results/` and are ignored by Git. See `docs/adr/0001-geospatial-database-engine-benchmark.md` for the protocol and current baseline.
+
 ## Current Status
 
 This repository is in its bootstrap stage. The structure is set up to support the planned navigation application, but the core business logic, spatial indexes, and API contracts are still being implemented.
