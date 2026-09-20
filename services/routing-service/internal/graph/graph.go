@@ -15,6 +15,7 @@ type Node struct {
 }
 
 type Edge struct {
+	ID       int
 	From     int
 	To       int
 	Weight   float64
