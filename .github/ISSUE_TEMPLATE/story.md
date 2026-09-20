@@ -20,7 +20,10 @@ Provide background information, context, or technical motivation behind this sto
 - [ ] 
 - [ ] 
 
-## Related Links / Dependencies
-- **Closes / Fixes:** #
+## Related Issues
+- **Related:** #
 - **Depends on:** #
+- **Closes / Fixes:** #
+
+## Related Links / Design Documents
 - **RFC / Design Doc:**

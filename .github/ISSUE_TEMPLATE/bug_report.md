@@ -28,3 +28,8 @@ A description of what actually happened, including error logs or stack traces if
 
 ## Additional Context
 Add any other context, screenshots, or visual aid about the problem here.
+
+## Related Issues
+- **Related:** #
+- **Depends on:** #
+- **Duplicate of:** #
