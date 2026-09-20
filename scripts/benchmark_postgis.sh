@@ -88,10 +88,10 @@ SQL
   echo
   echo "## Memory-sensitive join plan"
   echo "### PostgreSQL memory before join"
-  docker exec "$CONTAINER_NAME" sh -c "ps -o rss= -C postgres | awk '{sum += \$1} END {print \"postgres_rss_kb=\" sum}'"
+  docker stats --no-stream --format "container_memory_usage={{.MemUsage}}" "$CONTAINER_NAME"
   echo "### Join plan and buffer consumption"
   psql_exec -P pager=off -c "EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) SELECT count(*) FROM benchmark.points p1 JOIN benchmark.points p2 ON ST_DWithin(p1.geom, p2.geom, 0.01) WHERE p1.id <= 1000;"
   echo "### PostgreSQL memory after join"
-  docker exec "$CONTAINER_NAME" sh -c "ps -o rss= -C postgres | awk '{sum += \$1} END {print \"postgres_rss_kb=\" sum}'"
+  docker stats --no-stream --format "container_memory_usage={{.MemUsage}}" "$CONTAINER_NAME"
 } | tee "$REPORT"
 echo "Benchmark report written to $REPORT"
