@@ -1,0 +1,117 @@
+PostGIS benchmark
+timestamp_utc=20260920T083227Z
+database=mapdb
+scale=100000
+clients=8
+duration_seconds=30
+
+## PostGIS version
+POSTGIS="3.4.3 e365945" [EXTENSION] PGSQL="160" GEOS="3.9.0-CAPI-1.16.2" PROJ="7.2.1 NETWORK_ENABLED=OFF URL_ENDPOINT=https://cdn.proj.org USER_WRITABLE_DIRECTORY=/var/lib/postgresql/.local/share/proj DATABASE_PATH=/usr/share/proj/proj.db" LIBXML="2.9.10" LIBJSON="0.15" LIBPROTOBUF="1.3.3" WAGYU="0.5.0 (Internal)" TOPOLOGY
+
+## Bulk insert setup and throughput
+DROP SCHEMA
+CREATE SCHEMA
+CREATE TABLE
+INSERT 0 100000
+elapsed_seconds=0.55
+CREATE INDEX
+ANALYZE
+
+## Spatial operator plans
+### ST_DWithin
+                                                               QUERY PLAN                                                                
+-----------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=69.67..69.68 rows=1 width=8) (actual time=0.210..0.211 rows=1 loops=1)
+   Buffers: shared hit=8 read=7
+   ->  Bitmap Heap Scan on points  (cost=4.44..69.65 rows=10 width=0) (actual time=0.172..0.206 rows=7 loops=1)
+         Filter: st_dwithin(geom, '0101000020E610000000000000000000000000000000000000'::geometry, '1'::double precision)
+         Rows Removed by Filter: 1
+         Heap Blocks: exact=8
+         Buffers: shared hit=8 read=7
+         ->  Bitmap Index Scan on benchmark_points_geom_gist  (cost=0.00..4.44 rows=4 width=0) (actual time=0.138..0.138 rows=8 loops=1)
+               Index Cond: (geom && st_expand('0101000020E610000000000000000000000000000000000000'::geometry, '1'::double precision))
+               Buffers: shared read=7
+ Planning:
+   Buffers: shared hit=196
+ Planning Time: 9.059 ms
+ Execution Time: 0.369 ms
+(14 rows)
+
+### ST_Intersects
+                                                                                                                     QUERY PLAN                                                                                                                      
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=8016.90..8016.91 rows=1 width=8) (actual time=1.614..1.615 rows=1 loops=1)
+   Buffers: shared hit=436 read=10
+   ->  Bitmap Heap Scan on points  (cost=16.74..8015.46 rows=576 width=0) (actual time=0.498..1.569 rows=606 loops=1)
+         Filter: st_intersects(geom, '0103000020E6100000010000000500000000000000000024C000000000000024C000000000000024C0000000000000244000000000000024400000000000002440000000000000244000000000000024C000000000000024C000000000000024C0'::geometry)
+         Heap Blocks: exact=429
+         Buffers: shared hit=436 read=10
+         ->  Bitmap Index Scan on benchmark_points_geom_gist  (cost=0.00..16.60 rows=576 width=0) (actual time=0.428..0.428 rows=606 loops=1)
+               Index Cond: (geom && '0103000020E6100000010000000500000000000000000024C000000000000024C000000000000024C0000000000000244000000000000024400000000000002440000000000000244000000000000024C000000000000024C000000000000024C0'::geometry)
+               Buffers: shared hit=7 read=10
+ Planning:
+   Buffers: shared hit=188
+ Planning Time: 9.155 ms
+ Execution Time: 1.765 ms
+(13 rows)
+
+### Bounding box
+                                                                                                                     QUERY PLAN                                                                                                                     
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=818.34..818.35 rows=1 width=8) (actual time=0.984..0.985 rows=1 loops=1)
+   Buffers: shared hit=446
+   ->  Bitmap Heap Scan on points  (cost=16.74..816.90 rows=576 width=0) (actual time=0.249..0.944 rows=606 loops=1)
+         Recheck Cond: (geom && '0103000020E6100000010000000500000000000000000024C000000000000024C000000000000024C0000000000000244000000000000024400000000000002440000000000000244000000000000024C000000000000024C000000000000024C0'::geometry)
+         Heap Blocks: exact=429
+         Buffers: shared hit=446
+         ->  Bitmap Index Scan on benchmark_points_geom_gist  (cost=0.00..16.60 rows=576 width=0) (actual time=0.182..0.182 rows=606 loops=1)
+               Index Cond: (geom && '0103000020E6100000010000000500000000000000000024C000000000000024C000000000000024C0000000000000244000000000000024400000000000002440000000000000244000000000000024C000000000000024C000000000000024C0'::geometry)
+               Buffers: shared hit=17
+ Planning:
+   Buffers: shared hit=116
+ Planning Time: 8.971 ms
+ Execution Time: 1.117 ms
+(13 rows)
+
+
+## Concurrent query benchmark
+CREATE TABLE
+INSERT 0 1
+pgbench (16.4 (Debian 16.4-1.pgdg110+2))
+transaction type: /tmp/pgbench-20260920T083227Z.sql
+scaling factor: 1
+query mode: prepared
+number of clients: 8
+number of threads: 1
+maximum number of tries: 1
+duration: 30 s
+number of transactions actually processed: 56700
+number of failed transactions: 0 (0.000%)
+latency average = 4.228 ms
+initial connection time = 41.209 ms
+tps = 1892.359646 (without initial connection time)
+
+## Memory-sensitive join plan
+                                                                       QUERY PLAN                                                                        
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=132478.62..132478.63 rows=1 width=8) (actual time=37.095..37.097 rows=1 loops=1)
+   Buffers: shared hit=4271 read=405
+   ->  Nested Loop  (cost=0.70..132444.47 rows=13660 width=0) (actual time=6.215..36.946 rows=1002 loops=1)
+         Buffers: shared hit=4271 read=405
+         ->  Index Scan using points_pkey on points p1  (cost=0.29..41.98 rows=1011 width=32) (actual time=0.021..0.349 rows=1000 loops=1)
+               Index Cond: (id <= 1000)
+               Buffers: shared hit=13
+         ->  Index Scan using benchmark_points_geom_gist on points p2  (cost=0.41..130.86 rows=10 width=32) (actual time=0.027..0.030 rows=1 loops=1000)
+               Index Cond: (geom && st_expand(p1.geom, '0.01'::double precision))
+               Filter: st_dwithin(p1.geom, geom, '0.01'::double precision)
+               Buffers: shared hit=4258 read=405
+ Planning:
+   Buffers: shared hit=220
+ Planning Time: 13.118 ms
+ JIT:
+   Functions: 10
+   Options: Inlining false, Optimization false, Expressions true, Deforming true
+   Timing: Generation 0.587 ms, Inlining 0.000 ms, Optimization 0.304 ms, Emission 5.540 ms, Total 6.431 ms
+ Execution Time: 68.082 ms
+(19 rows)
+
