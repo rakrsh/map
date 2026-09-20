@@ -2,15 +2,15 @@
 Use a concise, descriptive title in the format: `type: summary of change`
 
 Common types:
-- `feat` – new feature or functionality
-- `fix` – bug fix
-- `docs` – documentation updates
-- `chore` – maintenance, tooling, or housekeeping tasks
-- `refactor` – internal restructuring without behavior changes
-- `test` – test additions or fixes
-- `perf` – performance improvements
-- `ci` – CI or workflow updates
-- `revert` – revert a previous change
+- `feat` - new feature or functionality
+- `fix` - bug fix
+- `docs` - documentation updates
+- `chore` - maintenance, tooling, or housekeeping tasks
+- `refactor` - internal restructuring without behavior changes
+- `test` - test additions or fixes
+- `perf` - performance improvements
+- `ci` - CI or workflow updates
+- `revert` - revert a previous change
 
 Examples:
 - `docs: add pull request template`
