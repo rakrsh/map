@@ -49,6 +49,18 @@ The verified local run used 100,000 rows per point/line workload and 1,000 polyg
 
 The report is intentionally generated locally because benchmark results depend on host resources. Cross-engine measurements are not yet recorded; the final choice must not be marked accepted until equivalent adapters have been run for the candidate engines.
 
+## Comparison status
+
+The H3 adapter was run locally with `BENCHMARK_SCALE=1000`:
+
+| Measurement | Result |
+| --- | ---: |
+| Input coordinates | 1,000 |
+| Unique H3 cells | 359 |
+| Indexing throughput | 546,657.17 cells/s |
+
+ClickHouse and ScyllaDB were not run because no local services were available on ports `8123` and `9042`. Their adapters remain ready for execution after the corresponding benchmark containers or environments are provisioned. These results are not directly interchangeable with PostGIS because H3 is an indexing library and ScyllaDB does not provide equivalent native spatial predicates.
+
 ## Decision
 
 Pending benchmark results. The existing application scaffold may continue using PostGIS for local development, but production engine selection remains provisional until the benchmark table is populated.
