@@ -121,6 +121,8 @@ docker compose up --build
 - Elasticsearch: http://localhost:9200
 - Redis: localhost:6379
 
+The backing services expose Docker healthchecks. Use `docker compose ps` and wait for `healthy` before testing dependent services.
+
 ## Environment Variables
 
 The project uses values defined in `.env.example`:
@@ -187,6 +189,17 @@ make benchmark-graph
 ```
 
 The current prototype selects CCH for dynamic traffic updates. See `docs/adr/0002-navigation-graph-architecture.md` for the measured comparison and production follow-up work.
+
+## Issue and PR Linking
+
+Use recognized GitHub closing keywords in the PR description:
+
+```text
+Closes #123
+Fixes #456
+```
+
+When the PR is merged into the repository's default branch, GitHub closes the referenced issues automatically. `Related #123` and `Depends on #456` create links but do not close issues. Project-board status changes require GitHub Projects workflow automation to be configured in the project settings; they are not controlled by repository files.
 
 ## Current Status
 
