@@ -20,6 +20,8 @@ Agents must:
 - for every feature update, review and update affected skills, agent instructions, docs, tests, README, CONTRIBUTING.md, configuration, and other necessary files
 - run `make test`, `make lint`, and `make scan-sast` before submitting PR recommendations when those targets are available
 - include the approved project copyright header in newly authored files when project policy requires it; never invent legal text
+- use the latest stable releases of reusable CI actions, verified from each action's official release page before workflow changes
+- pin every `uses:` reference to the full 40-character commit SHA for that release and retain a version comment, for example `actions/checkout@<full-sha> # v7.0.1`; never use shortened SHAs, mutable tags, or branches
 
 ## Verification Commands
 
@@ -46,4 +48,4 @@ A PR must explain the change, link its issue with `Closes #<number>` or `Fixes #
 
 Feature PRs must include a supporting-file review covering skills, agent guidance, documentation, tests, README, CONTRIBUTING.md, configuration, and any affected API, migration, workflow, or deployment files. Mark each item updated or explain why it is not applicable.
 
-Before recommending merge, run `make test`, `make lint`, and `make scan-sast`, plus any focused checks required by the issue. If `make scan-sast` is not available yet, report that gap instead of claiming a security scan passed.
+Before recommending merge, run `make test`, `make lint`, and `make scan-sast`, plus any focused checks required by the issue. Report any unavailable dependency or failed security scan explicitly.
