@@ -20,7 +20,8 @@ Agents must:
 - for every feature update, review and update affected skills, agent instructions, docs, tests, README, CONTRIBUTING.md, configuration, and other necessary files
 - run `make test`, `make lint`, and `make scan-sast` before submitting PR recommendations when those targets are available
 - include the approved project copyright header in newly authored files when project policy requires it; never invent legal text
-- use the latest stable major versions of reusable CI actions, verified from the action's official release page before workflow changes
+- use the latest stable releases of reusable CI actions, verified from each action's official release page before workflow changes
+- pin every `uses:` reference to the full 40-character commit SHA for that release and retain a version comment, for example `actions/checkout@<full-sha> # v7.0.1`; never use shortened SHAs, mutable tags, or branches
 
 ## Verification Commands
 
