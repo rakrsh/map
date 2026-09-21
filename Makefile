@@ -1,6 +1,6 @@
 # Makefile for local development and service orchestration
 
-.PHONY: dev-up dev-down logs build test fmt lint scan-sast scan-secrets scan-dependencies scan-licenses scan-dast scan-security sonar-scan validate-config benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3 benchmark-graph
+.PHONY: dev-up dev-down logs build test fmt lint scan-sast scan-secrets scan-dependencies scan-licenses scan-dast scan-security validate-config benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3 benchmark-graph
 
 dev-up:
 	docker compose up --build -d
@@ -55,10 +55,6 @@ scan-dast:
 	@docker run --rm --network host -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t "$${TARGET:-http://localhost:8000/health}" -I
 
 scan-security: scan-sast scan-secrets scan-dependencies scan-licenses
-
-sonar-scan:
-	@test -n "$(SONAR_TOKEN)" -a -n "$(SONAR_HOST_URL)" || (echo "SONAR_TOKEN and SONAR_HOST_URL are required" >&2; exit 1)
-	@docker run --rm -e SONAR_HOST_URL -e SONAR_TOKEN -v "$$(pwd):/usr/src" sonarsource/sonar-scanner-cli:latest
 
 validate-config:
 	@docker compose --env-file .env.example config --quiet

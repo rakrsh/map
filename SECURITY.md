@@ -37,7 +37,7 @@ Pull requests and pushes to `main` run:
 - Gitleaks secret detection
 - Trivy filesystem vulnerability, license, and misconfiguration scanning
 - ZAP baseline DAST against the local geocoding health endpoint
-- SonarCloud analysis when the repository variable `SONAR_ENABLED=true` and secrets `SONAR_TOKEN` and `SONAR_HOST_URL` are configured
+- Semgrep, Trivy, Gitleaks, and ZAP provide the free security-analysis stack; SonarQube/SonarCloud is intentionally deferred
 
 A scan with a High or Critical vulnerability, a detected secret, a restricted license, or a failed quality gate blocks the security job.
 

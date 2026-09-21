@@ -64,14 +64,3 @@ jobs:
           fail_action: true
       - if: always()
         run: docker compose --env-file .env.example down -v
-
-  sonar:
-    name: Sonar quality gate
-    if: ${{ vars.SONAR_ENABLED == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: SonarSource/sonarqube-scan-action@ba9859eae8dd6bd29e412f25ddbbef3d032000f4 # v8.2.2
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
