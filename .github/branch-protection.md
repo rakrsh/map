@@ -16,6 +16,8 @@ GitHub repository administrators must configure these settings for `main`; they 
 - Enable automatic head-branch deletion after merge.
 - Use a ruleset or branch protection rule targeting `main`.
 
+PR size labels are advisory: `size/M` is more than 250 changed lines, `size/L` is more than 750, and `size/XL` is more than 1,500. The workflow warns on `size/XL` but does not block large PRs.
+
 ## Feature Flags
 
 Incomplete work should be merged behind a configuration-controlled feature flag. Flags must default to the safe or disabled state, avoid secrets, and include an owner and removal issue. A flag should be removed when the feature is fully released.

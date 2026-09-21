@@ -85,7 +85,7 @@ jobs:
             const additions = context.payload.pull_request.additions;
             const deletions = context.payload.pull_request.deletions;
             const changes = additions + deletions;
-            const label = changes > 300 ? 'size/XL' : changes > 150 ? 'size/L' : changes > 50 ? 'size/M' : 'size/S';
+            const label = changes > 1500 ? 'size/XL' : changes > 750 ? 'size/L' : changes > 250 ? 'size/M' : 'size/S';
             const labels = await github.paginate(github.rest.issues.listLabelsOnIssue, {
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -95,4 +95,4 @@ jobs:
               await github.rest.issues.removeLabel({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, name: existing.name });
             }
             await github.rest.issues.addLabels({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, labels: [label] });
-            if (changes > 300) core.warning(`PR changes ${changes} lines; split it into smaller trunk-based changes when possible.`);
+            if (changes > 1500) core.warning(`PR changes ${changes} lines; consider splitting it into smaller trunk-based changes when practical.`);
