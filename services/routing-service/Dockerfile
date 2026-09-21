@@ -10,6 +10,9 @@ COPY internal ./internal
 RUN go mod download
 RUN go build -o /routing-service ./cmd/server
 
+RUN addgroup -S app && adduser -S -G app app
+USER app
+
 EXPOSE 8081
 
 CMD ["/routing-service"]

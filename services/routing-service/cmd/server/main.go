@@ -24,6 +24,8 @@ func main() {
 	addr := fmt.Sprintf(":%s", cfg.Port)
 	log.Printf("routing-service listening on %s", addr)
 
+	// Local Compose traffic is plain HTTP; TLS terminates at the deployment edge.
+	// nosemgrep: go.lang.security.audit.net.use-tls.use-tls
 	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Printf("server exited: %v", err)
 		os.Exit(1)
