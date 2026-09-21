@@ -4,6 +4,16 @@
 
 Use a short-lived branch from `main`, keep commits focused, and open a PR using the repository template. Use Conventional Commit-style titles such as `feat:`, `fix:`, `docs:`, `test:`, or `chore:`.
 
+## Trunk-Based Development
+
+`main` is the single source of truth. Work on short-lived branches named `feat/<scope>`, `fix/<scope>`, `docs/<scope>`, or `chore/<scope>` and keep them synchronized with `main`. Aim to merge focused changes within 24-48 hours using squash or rebase merge; merge commits are disabled by repository policy.
+
+All PRs must pass Trunk CI, AI governance validation, required reviews, and the configured security gates before merge. Large PRs are labeled automatically; split changes labeled `size/XL` whenever possible.
+
+Incomplete work must be protected by a disabled-by-default feature flag with an owner and removal issue. Do not use feature flags for secrets or security controls.
+
+Repository administrators must configure the settings in [.github/branch-protection.md](.github/branch-protection.md).
+
 For every feature update, review the complete change surface and update affected skills, agent instructions, documentation, tests, README, this guide, configuration, API contracts, migrations, workflows, and deployment files. Record any intentionally unchanged area as not applicable in the PR.
 
 ## AI-Assisted Development
@@ -25,6 +35,7 @@ Before opening a PR, run:
 ```bash
 make test
 make lint
+make scan-sast
 docker compose --env-file .env.example config --quiet
 ```
 

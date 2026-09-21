@@ -27,6 +27,7 @@ Map Navigation Engine is a service-oriented map platform with Go routing and til
 - Use ASCII by default and add comments only when they clarify non-obvious logic.
 - Include the approved project copyright header in newly authored files when repository policy requires it; never invent legal text. Do not rewrite existing or third-party headers.
 - Avoid deprecated libraries and patterns; justify any exception in the PR description.
+- Use the latest stable major versions of reusable CI actions, verified from each action's official release page before updating workflows.
 
 ## Feature Update Checklist
 
@@ -48,7 +49,7 @@ Before proposing a PR, run the narrowest relevant checks and report the commands
 - Go tiles: `cd services/tile-service && go test ./... && go vet ./...`
 - Python: `python -m compileall services/geocoding-service/app`
 - Compose: `docker compose --env-file .env.example config --quiet`
-- Repository checks: `make test`, `make lint`, and `make scan-sast` when the security tooling target is available
+- Repository checks: `make test`, `make lint`, and `make scan-sast`
 
 Do not claim a check passed without fresh output. If a dependency is unavailable, report the blocker explicitly.
 

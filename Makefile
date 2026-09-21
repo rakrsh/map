@@ -1,6 +1,6 @@
 # Makefile for local development and service orchestration
 
-.PHONY: dev-up dev-down logs build test fmt lint validate-config benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3 benchmark-graph
+.PHONY: dev-up dev-down logs build test fmt lint scan-sast validate-config benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3 benchmark-graph
 
 dev-up:
 	docker compose up --build -d
@@ -36,6 +36,10 @@ lint:
 	@cd services/tile-service && go vet ./...
 	@cd services/geocoding-service && python -m compileall app
 	@test -z "$$(gofmt -l services/routing-service services/tile-service)"
+
+scan-sast:
+	@command -v semgrep >/dev/null 2>&1 || (echo "semgrep is required; install it with: python -m pip install semgrep" >&2; exit 1)
+	@semgrep scan --config auto --error .
 
 validate-config:
 	@docker compose --env-file .env.example config --quiet
