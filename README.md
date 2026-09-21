@@ -190,6 +190,18 @@ make benchmark-graph
 
 The current prototype selects CCH for dynamic traffic updates. See `docs/adr/0002-navigation-graph-architecture.md` for the measured comparison and production follow-up work.
 
+## Security Verification
+
+Security checks are available through the Makefile:
+
+```bash
+make scan-sast
+make scan-security
+make scan-dast TARGET=http://localhost:8000/health
+```
+
+See [SECURITY.md](SECURITY.md) for scan prerequisites, CI coverage, remediation, and vulnerability reporting guidance.
+
 ## Issue and PR Linking
 
 Use recognized GitHub closing keywords in the PR description:
