@@ -1,6 +1,6 @@
 # Makefile for local development and service orchestration
 
-.PHONY: dev-up dev-down logs build test fmt lint scan-sast validate-config benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3 benchmark-graph
+.PHONY: dev-up dev-down logs build test fmt lint scan-sast scan-secrets scan-dependencies scan-licenses scan-dast scan-security validate-config benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3 benchmark-graph
 
 dev-up:
 	docker compose up --build -d
@@ -40,6 +40,21 @@ lint:
 scan-sast:
 	@command -v semgrep >/dev/null 2>&1 || (echo "semgrep is required; install it with: python -m pip install semgrep" >&2; exit 1)
 	@semgrep scan --config auto --error .
+
+scan-secrets:
+	@command -v gitleaks >/dev/null 2>&1 || (echo "gitleaks is required; install it from https://github.com/gitleaks/gitleaks" >&2; exit 1)
+	@gitleaks detect --source . --redact --no-banner
+
+scan-dependencies:
+	@docker run --rm -v "$$(pwd):/repo" aquasec/trivy:0.70.0 fs --scanners vuln,misconfig,secret --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 /repo
+
+scan-licenses:
+	@docker run --rm -v "$$(pwd):/repo" aquasec/trivy:0.70.0 fs --scanners license --severity HIGH,CRITICAL --exit-code 1 /repo
+
+scan-dast:
+	@docker run --rm --network host -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t "$${TARGET:-http://localhost:8000/health}" -I
+
+scan-security: scan-sast scan-secrets scan-dependencies scan-licenses
 
 validate-config:
 	@docker compose --env-file .env.example config --quiet

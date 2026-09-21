@@ -39,6 +39,8 @@ make scan-sast
 docker compose --env-file .env.example config --quiet
 ```
 
+Before opening a security-sensitive PR, also run `make scan-security` and record any required local dependency or Docker runtime in the PR testing details. Use `make scan-dast TARGET=<running-service-url>` against a running local target when endpoint behavior changes.
+
 Document any unavailable dependency, skipped check, or post-merge action in the PR.
 
 ## Issue Linking
