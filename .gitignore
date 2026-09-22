@@ -218,3 +218,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+tests/e2e/node_modules
+tests/e2e/playwright-report
+tests/e2e/test-results
+
+# Node modules
+**/node_modules
+**/node_modules/**

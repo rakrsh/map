@@ -9,8 +9,9 @@ Map Navigation Engine is a service-oriented map platform with Go routing and til
 - `services/routing-service`: Go routing service and graph experiments
 - `services/tile-service`: Go vector tile service
 - `services/geocoding-service`: Python/FastAPI geocoding service
+- `tests/e2e`: Playwright E2E browser and API test suite
 - `config`: database and search configuration
-- `scripts`: local ingestion and benchmark scripts
+- `scripts`: local ingestion, benchmark, and test runner scripts
 - `docs/adr`: architecture decisions
 - `.github/skills`: reusable AI workflows
 

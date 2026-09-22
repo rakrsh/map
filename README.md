@@ -190,17 +190,38 @@ make benchmark-graph
 
 The current prototype selects CCH for dynamic traffic updates. See `docs/adr/0002-navigation-graph-architecture.md` for the measured comparison and production follow-up work.
 
-## Security Verification
+## Testing Strategy & Automation
 
-Security checks are available through the Makefile:
+The repository includes a comprehensive testing architecture across unit, integration, and E2E suites:
+
+- **Unit Tests with Isolated Doubles**: Fast, isolated unit tests using mocks/stubs in Python (`pytest-mock`, `FastAPI TestClient`) and Go (`httptest`, table-driven tests) with parallel execution.
+- **Code Coverage Threshold (>=80%)**: Automated coverage verification enforcing an 80% minimum line coverage threshold across all Go and Python microservices.
+- **Integration Tests with Ephemeral Containers**: Orchestrates transient PostGIS, Redis, and Elasticsearch containers via `docker-compose.test.yml`, waits for health readiness, runs integration test suites, and guarantees clean teardown.
+- **E2E Automation with Playwright**: Headless browser and API test execution with automated artifact logging (traces, failure screenshots, video recordings, and HTML reports).
+
+### Running Tests Locally
 
 ```bash
-make scan-sast
-make scan-security
-make scan-dast TARGET=http://localhost:8000/health
+# Run unit tests with isolated doubles in parallel
+make test-unit
+
+# Enforce code coverage thresholds (>=80%)
+make test-coverage
+
+# Run integration tests against ephemeral containers (PostGIS, Redis, Elasticsearch)
+make test-integration
+
+# Run Playwright E2E test suite with artifact capture
+make test-e2e
+
+# Run the complete test suite (Unit + Coverage + Integration + E2E)
+make test-all
+
+# Default test check (Unit + Coverage)
+make test
 ```
 
-See [SECURITY.md](SECURITY.md) for scan prerequisites, CI coverage, remediation, and vulnerability reporting guidance.
+## Security Verification
 
 ## Issue and PR Linking
 
