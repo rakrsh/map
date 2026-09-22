@@ -1,0 +1,23 @@
+{
+  "name": "map-navigation-e2e",
+  "version": "1.0.0",
+  "description": "End-to-End automated testing suite for Map Navigation Engine with Playwright artifact logging",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report"
+  },
+  "keywords": [
+    "playwright",
+    "e2e",
+    "testing",
+    "map-navigation"
+  ],
+  "author": "Ravi Sharma",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "@types/node": "^20.12.0"
+  }
+}

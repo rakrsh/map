@@ -3,32 +3,16 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/gorilla/mux"
+	"map/tile-service/internal/handler"
 )
 
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/health", func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
-	}).Methods(http.MethodGet)
-
-	r.HandleFunc("/tiles/{z}/{x}/{y}", func(w http.ResponseWriter, req *http.Request) {
-		vars := mux.Vars(req)
-		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(map[string]string{
-			"message": "tile request",
-			"z":       vars["z"],
-			"x":       vars["x"],
-			"y":       vars["y"],
-		})
-	}).Methods(http.MethodGet)
+	r := handler.NewRouter()
 
 	port := os.Getenv("PORT")
 	if port == "" {

@@ -1,6 +1,7 @@
 # Makefile for local development and service orchestration
+# Copyright (c) 2026 Ravi Sharma
 
-.PHONY: dev-up dev-down logs build test fmt lint scan-sast scan-secrets scan-dependencies scan-licenses scan-dast scan-security validate-config benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3 benchmark-graph
+.PHONY: dev-up dev-down logs build test test-unit test-coverage test-integration test-e2e test-all fmt lint scan-sast scan-secrets scan-dependencies scan-licenses scan-dast scan-security validate-config benchmark-postgis benchmark-clickhouse benchmark-scylladb benchmark-h3 benchmark-graph
 
 dev-up:
 	docker compose up --build -d
@@ -17,11 +18,27 @@ logs:
 build:
 	docker compose build
 
-test:
-	@echo "Running Go tests..."
-	@cd services/routing-service && go test ./...
-	@cd services/tile-service && go test ./...
-	@cd services/geocoding-service && python -m compileall app
+test-unit:
+	@echo "Running unit tests in parallel with isolated doubles..."
+	@cd services/routing-service && go test -v -p 4 ./internal/...
+	@cd services/tile-service && go test -v -p 4 ./internal/...
+	@cd services/geocoding-service && python -m pytest tests/unit -v -n auto
+
+test-coverage:
+	@echo "Enforcing code coverage thresholds (>=80%)..."
+	@python scripts/check_coverage.py --threshold 80.0
+
+test-integration:
+	@echo "Running integration tests with ephemeral containers..."
+	@python scripts/run_integration_tests.py
+
+test-e2e:
+	@echo "Running Playwright E2E automation with artifact capture..."
+	@python scripts/run_e2e_tests.py
+
+test-all: test-unit test-coverage test-integration test-e2e
+
+test: test-unit test-coverage
 
 fmt:
 	@echo "Formatting Go and Python sources..."
@@ -58,6 +75,7 @@ scan-security: scan-sast scan-secrets scan-dependencies scan-licenses
 
 validate-config:
 	@docker compose --env-file .env.example config --quiet
+	@docker compose -f docker-compose.test.yml config --quiet
 
 benchmark-postgis:
 	@bash scripts/benchmark_postgis.sh
