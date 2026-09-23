@@ -30,34 +30,22 @@ test.describe('Map Navigation End-to-End Workflow', () => {
     expect(routeData.message).toBe('route request received');
     expect(routeData.status).toBe('pending_implementation');
 
-    // 3. Tile Service Vector Tile Retrieval
-    const tileRes = await request.get(`${tileBase}/tiles/12/655/1583`);
-    expect(tileRes.ok()).toBeTruthy();
-    const tileData = await tileRes.json();
-    expect(tileData.z).toBe('12');
-    expect(tileData.x).toBe('655');
-    expect(tileData.y).toBe('1583');
+    // 3. Tile Service PNG tile retrieval (dev frontend)
+    const pngRes = await request.get(`${tileBase}/tiles/12/655/1583.png`);
+    expect(pngRes.ok()).toBeTruthy();
+    expect(pngRes.headers()['content-type']).toContain('image/png');
 
-    // 4. Browser verification & HTML DOM assertion for artifact logging
-    await page.setContent(`
-      <!DOCTYPE html>
-      <html>
-        <head><title>Map Navigation Dashboard</title></head>
-        <body>
-          <div id="status-panel">
-            <h1>Map Navigation Engine</h1>
-            <p id="geocoding-status">Geocoding: Ready</p>
-            <p id="routing-status">Routing: Ready</p>
-            <p id="tile-status">Tile Service: Ready</p>
-          </div>
-        </body>
-      </html>
-    `);
+    // 4. Load the real frontend and verify a Leaflet tile image is present
+    await page.goto(process.env.FRONTEND_URL || 'http://localhost:3000');
+    // Wait for the tile image network requests to be attempted
+    await page.waitForTimeout(500);
 
-    const statusPanel = page.locator('#status-panel');
-    await expect(statusPanel).toBeVisible();
-    await expect(page.locator('#geocoding-status')).toHaveText('Geocoding: Ready');
-    await expect(page.locator('#routing-status')).toHaveText('Routing: Ready');
-    await expect(page.locator('#tile-status')).toHaveText('Tile Service: Ready');
+    // Check that at least one tile <img> element is present in the Leaflet pane
+    const tileImg = page.locator('.leaflet-tile');
+    await expect(tileImg.first()).toBeVisible();
+
+    // Verify marker popup or marker exists (marker uses default Leaflet icon)
+    const marker = page.locator('.leaflet-marker-icon');
+    await expect(marker.first()).toBeVisible();
   });
 });
