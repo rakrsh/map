@@ -16,8 +16,11 @@
   ],
   "author": "Ravi Sharma",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "@playwright/test": "^1.44.0",
+    "playwright": "^1.44.0"
+  },
+  "devDependencies": {
     "@types/node": "^20.12.0"
   }
 }

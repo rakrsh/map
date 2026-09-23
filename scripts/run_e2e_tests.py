@@ -12,13 +12,25 @@ import shutil
 import subprocess
 import argparse
 import time
-import urllib.request
+import http.client
+from urllib.parse import urlparse
 
 
 def check_endpoint(url: str, timeout: int = 2) -> bool:
+    """Probe an HTTP health endpoint safely without dynamic urllib risks."""
     try:
-        with urllib.request.urlopen(url, timeout=timeout) as response:
-            return response.status == 200
+        parsed = urlparse(url)
+        if parsed.scheme != "http":
+            return False
+        host = parsed.hostname or "127.0.0.1"
+        port = parsed.port or 80
+        path = parsed.path or "/health"
+        
+        conn = http.client.HTTPConnection(host, port, timeout=timeout)
+        conn.request("GET", path)
+        res = conn.getresponse()
+        conn.close()
+        return res.status == 200
     except Exception:
         return False
 
@@ -45,7 +57,7 @@ def main():
 
     e2e_dir = os.path.join(os.getcwd(), "tests", "e2e")
     spawned_procs = []
-    npx_bin = shutil.which("npx") or "npx"
+    npm_bin = shutil.which("npm") or "npm"
 
     returncode = 1
     try:
@@ -93,8 +105,8 @@ def main():
                 sys.exit(1)
             print("[E2E] Microservices are ready.")
 
-        # Run Playwright
-        cmd = [npx_bin, "playwright", "test"]
+        # Run Playwright via npm test
+        cmd = [npm_bin, "test", "--"]
         if args.headed:
             cmd.append("--headed")
 
