@@ -1,0 +1,49 @@
+name: Frontend Checks
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  e2e:
+    name: Playwright E2E (frontend)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Prepare environment file
+        run: |
+          if [ -f .env ]; then echo ".env already exists"; else cp .env.example .env; fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+
+      - name: Start services (Docker Compose)
+        run: docker compose up --build -d
+
+      - name: Install frontend dependencies and Playwright browsers
+        working-directory: tests/e2e
+        run: |
+          npm ci
+          npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        working-directory: tests/e2e
+        env:
+          GEOCODING_URL: http://localhost:8000
+          ROUTING_URL: http://localhost:8081
+          TILE_URL: http://localhost:8082
+        run: |
+          npm test -- --reporter=list
+
+      - name: Tear down services
+        if: always()
+        run: docker compose down -v

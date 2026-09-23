@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Map Navigation - Dev</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+      html,body,#map { height: 100%; margin: 0; padding: 0; }
+      #map { width: 100vw; height: 100vh; }
+      .attribution { position: absolute; left: 8px; bottom: 4px; z-index: 1000; background: rgba(255,255,255,0.8); padding: 4px 6px; border-radius: 4px; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div class="attribution">Dev tiles from tile-service</div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      // Minimal Leaflet app using dev tile endpoint
+      const map = L.map('map').setView([37.7749, -122.4194], 12);
+
+      const tileUrl = (z, x, y) => `http://localhost:8082/tiles/${z}/${x}/${y}.png`;
+
+      const DevTileLayer = L.TileLayer.extend({
+        getTileUrl: function(coords) {
+          return tileUrl(coords.z, coords.x, coords.y);
+        }
+      });
+
+      const devLayer = new DevTileLayer('', { tileSize: 256, attribution: 'dev tiles' });
+      devLayer.addTo(map);
+
+      // Add a marker
+      L.marker([37.7749, -122.4194]).addTo(map).bindPopup('San Francisco (dev)');
+    </script>
+  </body>
+</html>

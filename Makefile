@@ -46,6 +46,11 @@ fmt:
 	@gofmt -w services/tile-service/**/*.go 2>/dev/null || true
 	@cd services/geocoding-service && python -m compileall app
 
+.PHONY: web-dev
+web-dev:
+	@echo "Opening dev web app (web/index.html). Ensure tile-service is running on :8082"
+	@python -m http.server --directory web 3000
+
 lint:
 	@echo "Running static checks..."
 	@$(MAKE) validate-config
