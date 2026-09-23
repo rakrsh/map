@@ -225,3 +225,15 @@ tests/e2e/test-results
 # Node modules
 **/node_modules
 **/node_modules/**
+
+# Coverage reports
+.coverage
+htmlcov/
+coverage.xml
+nosetests.xml
+pytest.xml
+coverage/
+htmlcov/
+coverage.*
+coverage
+coverage.out
