@@ -3,7 +3,9 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
+	"image/png"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -72,5 +74,36 @@ func TestMethodNotAllowed(t *testing.T) {
 
 	if res.StatusCode != http.StatusMethodNotAllowed {
 		t.Errorf("expected 405 Method Not Allowed, got %d", res.StatusCode)
+	}
+}
+
+func TestGetTilePNG(t *testing.T) {
+	router := NewRouter()
+	req := httptest.NewRequest(http.MethodGet, "/tiles/2/1/3.png", nil)
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+
+	res := rec.Result()
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.StatusCode)
+	}
+
+	ct := res.Header.Get("Content-Type")
+	if ct != "image/png" {
+		t.Fatalf("expected Content-Type image/png, got %s", ct)
+	}
+
+	buf := new(bytes.Buffer)
+	_, err := buf.ReadFrom(res.Body)
+	if err != nil {
+		t.Fatalf("failed to read response body: %v", err)
+	}
+
+	_, err = png.Decode(bytes.NewReader(buf.Bytes()))
+	if err != nil {
+		t.Fatalf("response is not valid PNG: %v", err)
 	}
 }

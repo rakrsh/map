@@ -66,8 +66,10 @@ func NewRouter() *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/health", HealthCheck).Methods(http.MethodGet)
 	// JSON placeholder (kept for compatibility)
-	r.HandleFunc("/tiles/{z}/{x}/{y}", GetTile).Methods(http.MethodGet)
 	// Dev tile endpoint for Leaflet and other web clients
+	// Register the more specific PNG route before the generic JSON route
 	r.HandleFunc("/tiles/{z}/{x}/{y}.png", GetTilePNG).Methods(http.MethodGet)
+	// JSON placeholder (kept for compatibility)
+	r.HandleFunc("/tiles/{z}/{x}/{y}", GetTile).Methods(http.MethodGet)
 	return r
 }
