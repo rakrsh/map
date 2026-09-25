@@ -120,7 +120,7 @@ db-migrate:
 		$$MIGRATE_BIN -path=db/migrations -database "${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" up; \
 	else \
 		# Use docker image when local binary unavailable. Pin image digests for reproducibility in CI.
-		docker run --rm -v "$$(pwd)/db/migrations:/migrations" --network host ghcr.io/golang-migrate/migrate:v4.15.2 \
+		docker run --rm -v "$$(pwd)/db/migrations:/migrations" --network host ${MIGRATE_IMAGE:-ghcr.io/golang-migrate/migrate:v4.15.2} \
 			-path=/migrations -database "$${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" up; \
 	fi
 
@@ -132,7 +132,7 @@ db-rollback:
 		$$MIGRATE_BIN -path=db/migrations -database "${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" down 1; \
 	else \
 		# Use docker image when local binary unavailable. Pin image digests for reproducibility in CI.
-		docker run --rm -v "$$(pwd)/db/migrations:/migrations" --network host ghcr.io/golang-migrate/migrate:v4.15.2 \
+		docker run --rm -v "$$(pwd)/db/migrations:/migrations" --network host ${MIGRATE_IMAGE:-ghcr.io/golang-migrate/migrate:v4.15.2} \
 			-path=/migrations -database "$${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" down 1; \
 	fi
 
