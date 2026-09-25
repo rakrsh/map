@@ -21,7 +21,7 @@ jobs:
           --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Wait for Postgres
         run: |
@@ -47,3 +47,21 @@ jobs:
         run: |
           export PGPASSWORD=postgres
           psql -h 127.0.0.1 -U postgres -d postgres -c "SELECT count(*) FROM places;"
+
+      - name: Rollback migrations (DOWN)
+        run: |
+          set -e
+          export PGPASSWORD=postgres
+          # Apply down scripts in reverse order to rollback
+          for f in $(ls db/migrations | sort -r); do
+            case "$f" in
+              *.down.sql) echo "Rolling back $f"; cat db/migrations/$f | psql -h 127.0.0.1 -U postgres -d postgres ;;
+              *) continue ;;
+            esac
+          done
+
+      - name: Verify rollback
+        run: |
+          export PGPASSWORD=postgres
+          # to_regclass returns NULL when table does not exist
+          psql -h 127.0.0.1 -U postgres -d postgres -t -c "SELECT to_regclass('public.places');" | sed -e 's/^ *//;s/ *$//' | grep -q '^$' || (echo 'places table still exists' >&2; exit 1)
