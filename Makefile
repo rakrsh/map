@@ -103,6 +103,12 @@ dev-map:
 	@echo "Run the tile service in one terminal: cd services/tile-service && go run ./cmd/server"
 	@echo "Then open the dev frontend: make web-dev or open web/index.html in a browser."
 
+.PHONY: db-load-fixtures
+db-load-fixtures:
+	@echo "Load sample fixtures into DATABASE_URL (${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres})"
+	@chmod +x scripts/load_sample_fixtures.sh
+	@DATABASE_URL="${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres}" scripts/load_sample_fixtures.sh
+
 # Database migration helpers (uses golang-migrate CLI or docker image ghcr.io/golang-migrate/migrate)
 .PHONY: db-migrate db-rollback db-create db-up db-down
 
