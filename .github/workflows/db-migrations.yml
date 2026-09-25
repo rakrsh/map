@@ -48,6 +48,13 @@ jobs:
           export PGPASSWORD=postgres
           psql -h 127.0.0.1 -U postgres -d postgres -c "SELECT count(*) FROM places;"
 
+      - name: Load sample fixtures
+        run: |
+          export PGPASSWORD=postgres
+          chmod +x scripts/load_sample_fixtures.sh
+          scripts/load_sample_fixtures.sh
+
+
       - name: Rollback migrations (DOWN)
         run: |
           set -e
