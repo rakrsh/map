@@ -97,18 +97,38 @@ benchmark-h3:
 benchmark-graph:
 	@cd services/routing-service && go run ./cmd/graph-benchmark
 
+.PHONY: dev-map
+dev-map:
+	@echo "Dev-mode map helper: starts the minimal frontend and hints to run tile-service locally."
+	@echo "Run the tile service in one terminal: cd services/tile-service && go run ./cmd/server"
+	@echo "Then open the dev frontend: make web-dev or open web/index.html in a browser."
+
 # Database migration helpers (uses golang-migrate CLI or docker image ghcr.io/golang-migrate/migrate)
 .PHONY: db-migrate db-rollback db-create db-up db-down
 
 db-migrate:
 	@echo "Apply all pending migrations to the database at ${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" \
-		&& docker run --rm -v "$$(pwd)/db/migrations:/migrations" --network host ghcr.io/golang-migrate/migrate:v4.15.2 \
-			-path=/migrations -database "$${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" up
+		|| true
+	@if [ -n "$$MIGRATE_BIN" ]; then \
+		echo "Using local migrate binary: $$MIGRATE_BIN"; \
+		$$MIGRATE_BIN -path=db/migrations -database "${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" up; \
+	else \
+		# Use docker image when local binary unavailable. Pin image digests for reproducibility in CI.
+		docker run --rm -v "$$(pwd)/db/migrations:/migrations" --network host ghcr.io/golang-migrate/migrate:v4.15.2 \
+			-path=/migrations -database "$${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" up; \
+	fi
 
 db-rollback:
 	@echo "Rollback last migration on ${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" \
-		&& docker run --rm -v "$$(pwd)/db/migrations:/migrations" --network host ghcr.io/golang-migrate/migrate:v4.15.2 \
-			-path=/migrations -database "$${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" down 1
+		|| true
+	@if [ -n "$$MIGRATE_BIN" ]; then \
+		echo "Using local migrate binary: $$MIGRATE_BIN"; \
+		$$MIGRATE_BIN -path=db/migrations -database "${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" down 1; \
+	else \
+		# Use docker image when local binary unavailable. Pin image digests for reproducibility in CI.
+		docker run --rm -v "$$(pwd)/db/migrations:/migrations" --network host ghcr.io/golang-migrate/migrate:v4.15.2 \
+			-path=/migrations -database "$${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" down 1; \
+	fi
 
 db-create:
 	@echo "Creating new migration stub: pass NAME=<description> (example: make db-create NAME=add_places_index)"
