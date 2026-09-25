@@ -1,4 +1,0 @@
-mode: atomic
-map/tile-service/internal/handler/tile_handler.go:12.60,15.2 2 1
-map/tile-service/internal/handler/tile_handler.go:17.56,26.2 3 1
-map/tile-service/internal/handler/tile_handler.go:28.30,33.2 4 3
