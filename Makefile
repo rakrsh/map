@@ -96,3 +96,33 @@ benchmark-h3:
 
 benchmark-graph:
 	@cd services/routing-service && go run ./cmd/graph-benchmark
+
+# Database migration helpers (uses golang-migrate CLI or docker image ghcr.io/golang-migrate/migrate)
+.PHONY: db-migrate db-rollback db-create db-up db-down
+
+db-migrate:
+	@echo "Apply all pending migrations to the database at ${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" \
+		&& docker run --rm -v "$$(pwd)/db/migrations:/migrations" --network host ghcr.io/golang-migrate/migrate:v4.15.2 \
+			-path=/migrations -database "$${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" up
+
+db-rollback:
+	@echo "Rollback last migration on ${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" \
+		&& docker run --rm -v "$$(pwd)/db/migrations:/migrations" --network host ghcr.io/golang-migrate/migrate:v4.15.2 \
+			-path=/migrations -database "$${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable}" down 1
+
+db-create:
+	@echo "Creating new migration stub: pass NAME=<description> (example: make db-create NAME=add_places_index)"
+	@test -n "${NAME}" || (echo "Please provide NAME variable, e.g. make db-create NAME=add_table" >&2; exit 1)
+	@python - <<'PY'
+import os,sys,datetime
+name = os.environ['NAME']
+ts = datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S')
+fn_up = f"V{ts}__{name}.up.sql"
+fn_down = f"V{ts}__{name}.down.sql"
+base = os.path.join(os.getcwd(),'db','migrations')
+os.makedirs(base,exist_ok=True)
+open(os.path.join(base,fn_up),'w').write('-- write UP migration here\n')
+open(os.path.join(base,fn_down),'w').write('-- write DOWN migration here\n')
+print('Created',fn_up,'and',fn_down)
+PY
+

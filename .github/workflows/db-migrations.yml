@@ -1,0 +1,49 @@
+name: CI - DB Migrations
+
+on:
+  pull_request:
+    paths:
+      - 'db/**'
+      - 'config/postgres/**'
+      - '**.sql'
+
+jobs:
+  validate-migrations:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for Postgres
+        run: |
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            pg_isready -h 127.0.0.1 -p 5432 -U postgres && break || sleep 2
+          done
+
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Apply migrations (UP)
+        run: |
+          set -e
+          export PGPASSWORD=postgres
+          for f in $(ls db/migrations | sort); do
+            case "$f" in
+              *.down.sql) continue ;;
+              *) echo "Applying $f"; cat db/migrations/$f | psql -h 127.0.0.1 -U postgres -d postgres ;;
+            esac
+          done
+
+      - name: Smoke test
+        run: |
+          export PGPASSWORD=postgres
+          psql -h 127.0.0.1 -U postgres -d postgres -c "SELECT count(*) FROM places;"
