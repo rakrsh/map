@@ -1,0 +1,36 @@
+name: PR Docs Build & Preview
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'sow/**'
+      - 'README.md'
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+
+      - name: Install MkDocs if available
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f mkdocs.yml ]; then python -m pip install mkdocs mkdocs-material; fi
+
+      - name: Build docs or package sources
+        run: |
+          mkdir -p docs-build
+          if [ -f mkdocs.yml ]; then mkdocs build -d docs-build; else cp -r sow docs || true; fi
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: pr-docs
+          path: docs-build
